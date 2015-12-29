@@ -205,7 +205,7 @@ typedef void (^YYWebImageCompletionBlock)(UIImage *image, NSURL *url, YYWebImage
  A manager to create and manage web image operation.
  */
 /**
- *  用来创建和管理网络图片任务的管理器
+ *  用来创建和管理网络图片任务的管理器,这个类其实就一个作用,管理生成一个YYWebImageOperation实例
  */
 @interface YYWebImageManager : NSObject
 
