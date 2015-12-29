@@ -157,11 +157,15 @@ typedef void (^YYWebImageCompletionBlock)(UIImage *image, NSURL *url, YYWebImage
 /**
  A manager to create and manage web image operation.
  */
+/**
+ *  用来创建和管理网络图片任务的管理器
+ */
 @interface YYWebImageManager : NSObject
 
 /**
  Returns global YYWebImageManager instance.
  
+ 不需要多解释,返回单例类
  @return YYWebImageManager shared instance.
  */
 + (instancetype)sharedManager;
@@ -173,6 +177,14 @@ typedef void (^YYWebImageCompletionBlock)(UIImage *image, NSURL *url, YYWebImage
  @param queue  The operation queue on which image operations are scheduled and run
                 (pass nil to make the new operation start immediately without queue).
  @return A new manager.
+ */
+/**
+ *  生成一个manager,带有缓存与操作队列
+ *
+ *  @param cache 图片缓存用到的manager,
+ *  @param queue 图片请求,调度运行的请求队列
+ *
+ *  @return 一个新的manager
  */
 - (instancetype)initWithCache:(YYImageCache *)cache queue:(NSOperationQueue *)queue NS_DESIGNATED_INITIALIZER;
 
@@ -189,6 +201,17 @@ typedef void (^YYWebImageCompletionBlock)(UIImage *image, NSURL *url, YYWebImage
  @param completion Completion block which will be invoked on background thread  (pass nil to avoid).
  @return A new image operation.
  */
+/**
+ *  创建返回一个新的operation,这个operation会立刻开始执行
+ *
+ *  @param url        图片url,可以是远程或者本地路径
+ *  @param options    控制下载的option
+ *  @param progress   进度block,会在后台线程的时候调用,传空的话会禁用此特性
+ *  @param transform  进入后台线程会调用此block,传空禁用此block
+ *  @param completion 进入后台线程会调用此block,传空禁用此block
+ *
+ *  @return 一个新的图片operation
+ */
 - (YYWebImageOperation *)requestImageWithURL:(NSURL *)url
                                      options:(YYWebImageOptions)options
                                     progress:(YYWebImageProgressBlock)progress
@@ -198,6 +221,9 @@ typedef void (^YYWebImageCompletionBlock)(UIImage *image, NSURL *url, YYWebImage
 /**
  The image cache used by image operation. 
  You can set it to nil to avoid image cache.
+ */
+/**
+ *  图片请求用到的缓存,可以设置为nil来禁用缓存
  */
 @property (nonatomic, strong) YYImageCache *cache;
 
