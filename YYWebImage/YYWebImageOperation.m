@@ -44,6 +44,7 @@ static UIApplication *_YYSharedApplication() {
 }
 
 /// Returns YES if the right-bottom pixel is filled.
+///当最右下角那个像素也被填充完毕后就返回YES
 static BOOL YYCGImageLastPixelFilled(CGImageRef image) {
     if (!image) return NO;
     size_t width = CGImageGetWidth(image);
@@ -71,9 +72,12 @@ static NSData *JPEGSOSMarker() {
 }
 
 
-static NSMutableSet *URLBlacklist;
-static OSSpinLock URLBlacklistLock;
+static NSMutableSet *URLBlacklist;//url黑名单,是一个集合
+static OSSpinLock URLBlacklistLock;//黑名单锁,OSSpinLock(自旋锁)大概是iOS中效率最高的一种锁了
 
+/**
+ *  初始化URL黑名单,使用了单例保证仅仅会创建一次,同时使用了自旋锁保证了多个地方同时进行黑名单读写操作的时候不会出错并且性能高效
+ */
 static void URLBlacklistInit() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -82,15 +86,24 @@ static void URLBlacklistInit() {
     });
 }
 
+/**
+ *  判断黑名单是否包含某个url的函数
+ */
 static BOOL URLBlackListContains(NSURL *url) {
     if (!url || url == (id)[NSNull null]) return NO;
     URLBlacklistInit();
+    //初始化黑名单之后,在调用containsObject方法前后都对黑名单进行加锁处理
     OSSpinLockLock(&URLBlacklistLock);
     BOOL contains = [URLBlacklist containsObject:url];
     OSSpinLockUnlock(&URLBlacklistLock);
     return contains;
 }
 
+/**
+ *  把url添加进黑名单
+ *
+ *  @param url 
+ */
 static void URLInBlackListAdd(NSURL *url) {
     if (!url || url == (id)[NSNull null]) return;
     URLBlacklistInit();

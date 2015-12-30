@@ -35,12 +35,26 @@
      4. Put the image to cache and return it with `completion` block.
  
  */
+/**
+ *  YYWebImageOperation 类是NSOperation的子类,用来通过请求获取图片, 
+ 
+     @discussion 首先这个operation是异步的,你可以通过把operation添加到一个queue里面来让这个operation生效,或者直接调用'start'方法.当这个operation开始之后,将会做以下事情:
+     1.从cache获取 图片,如果取到了,就返回'completion'block,并把图片传入block.
+     2.通过图片URL开启一个请求,会通过'progress'参数来通知women图片下载的进度,并且如果在传入option的时候开启了progressive option,会在completionblock里面返回一个渐进显示的图片
+     3.通过'transform'block来处理图片
+     4.把图片丢到cache中并且在'completion'block返回
+ */
 @interface YYWebImageOperation : NSOperation
 
+//图片请求
 @property (nonatomic, strong, readonly) NSURLRequest *request;     ///< The image URL request.
+//请求的相应结果
 @property (nonatomic, strong, readonly) NSURLResponse *response;   ///< The response for request.
+//理解为下载图片模式,具体见YYWebImageManager
 @property (nonatomic, assign, readonly) YYWebImageOptions options; ///< The operation's option.
+//缓存
 @property (nonatomic, strong, readonly) YYImageCache *cache;       ///< The image cache.
+//缓存key
 @property (nonatomic, strong, readonly) NSString *cacheKey;        ///< The image cache key.
 
 /**
@@ -50,6 +64,10 @@
  @discussion This is the value that is returned in the `NSURLConnectionDelegate` 
  method `-connectionShouldUseCredentialStorage:`.
  */
+/**
+ *  这个URL connection 是否是从 存储的认证里面授权查阅出来的.默认值为YES
+    @discussion 这个值是NSURLConnectionDelegate的方法-connectionShouldUseCredentialStorage:的返回值
+ */
 @property (nonatomic, assign) BOOL shouldUseCredentialStorage;
 
 /**
@@ -57,6 +75,9 @@
  
  @discussion This will be overridden by any shared credentials that exist for the 
  username or password of the request URL, if present.
+ */
+/**
+ *  NSURLCredential类
  */
 @property (nonatomic, strong) NSURLCredential *credential;
 
@@ -78,6 +99,20 @@
                      The block will be invoked in background thread. Pass nil to avoid it.
  
  @return The image request opeartion, or nil if an error occurs.
+ */
+/**
+ *  构造方法,会创建并返回一个新的operation
+    你应该调用start方法来开启这个operation,或者把它加到一个operation queue
+ *
+ *  @param request    图片请求,不可为nil
+ *  @param options    下载模式
+ *  @param cache      图片缓存,传nil的话就禁用了缓存
+ *  @param cacheKey   缓存key,传nil禁用图片缓存
+ *  @param progress   下载进度block
+ *  @param transform  这个block会在图片下载完成之前调用来让你对图片进行一些预处理,传nil禁用
+ *  @param completion 图片下载完成后或者已经取消下载了调用
+ *
+ *  @return operation实例,出现错误的话就为nil
  */
 - (instancetype)initWithRequest:(NSURLRequest *)request
                         options:(YYWebImageOptions)options
