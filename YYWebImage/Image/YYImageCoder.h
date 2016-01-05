@@ -313,6 +313,11 @@ typedef NS_ENUM(NSUInteger, YYImageBlendOperation) {
  @return an image decoded, or just return itself if no needed.
  @see yy_isDecodedForDisplay
  */
+/**
+*  把图片解压到位图,这样当图片在屏幕上显示的时候,主线程不会被阻塞住,如果图片已经被解压或者无法解压,直接返回图片自己咯
+*
+*  @return <#return value description#>
+*/
 - (instancetype)yy_imageByDecoded;
 
 /**
